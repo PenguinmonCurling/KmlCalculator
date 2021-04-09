@@ -69,9 +69,17 @@ namespace KmlCalculator
             clonedPlacemark.Id = placemark.Id;
             clonedPlacemark.Name = placemark.Name;
             var clonedGeometry = new MultipleGeometry();
-            foreach (var geometry in ((MultipleGeometry)placemark.Geometry).Geometry)
+            if (placemark.Geometry is MultipleGeometry)
+            {
+                foreach (var geometry in ((MultipleGeometry)placemark.Geometry).Geometry)
+                {
+                    clonedGeometry.AddGeometry(new Polygon { OuterBoundary = new OuterBoundary { LinearRing = new LinearRing { Coordinates = new CoordinateCollection(((Polygon)geometry).OuterBoundary.LinearRing.Coordinates) } } });
+                }
+            }
+            else if (placemark.Geometry is Polygon geometry)
             {
                 clonedGeometry.AddGeometry(new Polygon { OuterBoundary = new OuterBoundary { LinearRing = new LinearRing { Coordinates = new CoordinateCollection(((Polygon)geometry).OuterBoundary.LinearRing.Coordinates) } } });
+
             }
             clonedPlacemark.Geometry = clonedGeometry;
             return clonedPlacemark;
